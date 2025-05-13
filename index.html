@@ -1,27 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Marvel Kombat</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Marvel Kombat</h1>
-    <div id="user-info"></div>
-    <div id="stats">
-      <p><strong>Eternity:</strong> <span id="eternity">0</span></p>
-      <p><strong>Income/sec:</strong> <span id="income">0</span></p>
-      <button id="assemble-btn">Avengers, Assemble!</button>
-    </div>
+  <h1>💥 Marvel Kombat</h1>
 
-    <h2>Heroes</h2>
-    <div id="heroes" class="hero-list">
-      <!-- Герои вставятся через JS -->
-    </div>
-  </div>
+  <p>Eternity: <span id="eternity">0</span></p>
+
+  <button id="fightBtn">Avengers, Assemble!</button>
+
+  <h2>Upgrades</h2>
+  <button id="upgradeClick">Upgrade Click (+1 → +2) — 50 eternity</button>
+  <button id="autoClick">Hire Auto Hero — 100 eternity</button>
 
   <script src="script.js"></script>
 </body>
