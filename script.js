@@ -1,14 +1,14 @@
-// Загрузка данных из localStorage или установка по умолчанию
 let eternity = Number(localStorage.getItem("eternity")) || 0;
 let clickPower = Number(localStorage.getItem("clickPower")) || 1;
 let autoClick = Number(localStorage.getItem("autoClick")) || 0;
+
+console.log("Loaded from localStorage:", { eternity, clickPower, autoClick });
 
 const eternityDisplay = document.getElementById("eternity");
 const fightBtn = document.getElementById("fightBtn");
 const upgradeClickBtn = document.getElementById("upgradeClick");
 const autoClickBtn = document.getElementById("autoClick");
 
-// Обновление интерфейса и сохранение данных
 function updateUI() {
   eternityDisplay.textContent = eternity;
   localStorage.setItem("eternity", eternity);
@@ -16,13 +16,11 @@ function updateUI() {
   localStorage.setItem("autoClick", autoClick);
 }
 
-// Обработка клика по кнопке
 fightBtn.onclick = () => {
   eternity += clickPower;
   updateUI();
 };
 
-// Улучшение клика
 upgradeClickBtn.onclick = () => {
   if (eternity >= 50) {
     eternity -= 50;
@@ -33,7 +31,6 @@ upgradeClickBtn.onclick = () => {
   }
 };
 
-// Автоклик покупка
 autoClickBtn.onclick = () => {
   if (eternity >= 100) {
     eternity -= 100;
@@ -44,11 +41,10 @@ autoClickBtn.onclick = () => {
   }
 };
 
-// Автоклики раз в секунду
 setInterval(() => {
   eternity += autoClick;
   updateUI();
 }, 1000);
 
-// Первичная инициализация интерфейса
 updateUI();
+
