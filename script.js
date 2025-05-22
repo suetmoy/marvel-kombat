@@ -6,21 +6,32 @@ tg.expand(); // Раскрываем на полный экран
 const user = tg.initDataUnsafe.user || { id: "test_user_" + Math.random() }; // Для тестов вне Telegram
 const userId = user.id;
 
+// Герои
+const heroes = [
+  { name: "Captain America", cost: 100, income: 1 },
+  { name: "Thor", cost: 500, income: 5 },
+  { name: "Iron Man", cost: 1500, income: 10 },
+  { name: "Hulk", cost: 3000, income: 20 },
+  { name: "Spider-Man", cost: 5000, income: 30 },
+];
+
 // Начальные значения
 let eternity = 0;
 let clickPower = 1;
 let autoClick = 0;
+let ownedHeroes = [];
 
-// URL твоего Google Apps Script (замени на твой!)
-const API_URL = "https://script.google.com/macros/s/XXXX/exec"; // Вставь свою ссылку
+// URL твоего Google Apps Script
+const API_URL = "https://script.google.com/macros/s/AKfycbwM29IeHC2BALJ48apE293-RGTG5JiaBsTe1DZDbWLKZYq8UrVfjzY1f6myfPPfISjn/exec";
 
-// Элементы интерфейса
 const eternityDisplay = document.getElementById("eternity");
+const incomeDisplay = document.getElementById("income");
 const fightBtn = document.getElementById("fightBtn");
 const upgradeClickBtn = document.getElementById("upgradeClick");
 const autoClickBtn = document.getElementById("autoClick");
+const heroesContainer = document.getElementById("heroes");
 
-// Загрузка данных игрока
+// Загрузка данных
 async function loadUserData() {
   try {
     const response = await fetch(`${API_URL}?user_id=${userId}`);
@@ -28,9 +39,18 @@ async function loadUserData() {
     eternity = data.eternity || 0;
     clickPower = data.clickPower || 1;
     autoClick = data.autoClick || 0;
+    ownedHeroes = data.ownedHeroes || [];
     updateUI();
+    addHeroesToUI();
   } catch (error) {
     console.error("Error loading data:", error);
+    // Резервное сохранение из localStorage
+    eternity = parseInt(localStorage.getItem("eternity")) || 0;
+    clickPower = parseInt(localStorage.getItem("clickPower")) || 1;
+    autoClick = parseInt(localStorage.getItem("autoClick")) || 0;
+    ownedHeroes = JSON.parse(localStorage.getItem("ownedHeroes")) || [];
+    updateUI();
+    addHeroesToUI();
   }
 }
 
@@ -45,22 +65,58 @@ async function saveUserData() {
         eternity,
         clickPower,
         autoClick,
+        ownedHeroes,
       }),
     });
   } catch (error) {
     console.error("Error saving data:", error);
   }
+  // Резервное сохранение в localStorage
+  localStorage.setItem("eternity", eternity.toString());
+  localStorage.setItem("clickPower", clickPower.toString());
+  localStorage.setItem("autoClick", autoClick.toString());
+  localStorage.setItem("ownedHeroes", JSON.stringify(ownedHeroes));
 }
 
 // Обновление интерфейса
 function updateUI() {
   eternityDisplay.textContent = Math.floor(eternity);
-  localStorage.setItem("eternity", eternity.toString()); // Резервное сохранение
-  localStorage.setItem("clickPower", clickPower.toString());
-  localStorage.setItem("autoClick", autoClick.toString());
+  incomeDisplay.textContent = autoClick;
 }
 
-// Клик по кнопке
+// Добавление героев в интерфейс
+function addHeroesToUI() {
+  heroesContainer.innerHTML = "";
+  heroes.forEach((hero, index) => {
+    const isOwned = ownedHeroes.includes(hero.name);
+    const div = document.createElement("div");
+    div.className = "hero-card";
+    div.innerHTML = `
+      <strong>${hero.name}</strong><br>
+      Cost: ${hero.cost} Eternity<br>
+      Income: +${hero.income}/sec<br>
+      ${isOwned ? "<em>Owned</em>" : `<button onclick="buyHero(${index})">Recruit</button>`}
+    `;
+    heroesContainer.appendChild(div);
+  });
+}
+
+// Покупка героя
+function buyHero(index) {
+  const hero = heroes[index];
+  if (eternity >= hero.cost && !ownedHeroes.includes(hero.name)) {
+    eternity -= hero.cost;
+    ownedHeroes.push(hero.name);
+    autoClick += hero.income;
+    updateUI();
+    addHeroesToUI();
+    saveUserData();
+  } else {
+    alert("Not enough Eternity or already owned!");
+  }
+}
+
+// Клик
 fightBtn.onclick = () => {
   eternity += clickPower;
   updateUI();
@@ -98,6 +154,16 @@ setInterval(() => {
   saveUserData();
 }, 1000);
 
+// Telegram авторизация
+function setupTelegram() {
+  if (user) {
+    const userDiv = document.getElementById("user-info");
+    userDiv.innerHTML = `<p>Hello, ${user.first_name || "Hero"}!</p>`;
+  }
+}
+
 // Инициализация
+setupTelegram();
 loadUserData();
 updateUI();
+addHeroesToUI();
