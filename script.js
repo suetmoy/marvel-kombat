@@ -1,10 +1,10 @@
 // Telegram WebApp инициализация
 const tg = window.Telegram.WebApp;
-tg.expand(); // Раскрываем на полный экран
+tg.expand();
 
-// Получаем user_id
-const user = tg.initDataUnsafe.user || { id: "test_user_" + Math.random() }; // Для тестов вне Telegram
+const user = tg.initDataUnsafe.user || { id: "test_user_" + Math.random() };
 const userId = user.id;
+console.log("User ID:", userId);
 
 // Герои
 const heroes = [
@@ -21,7 +21,6 @@ let clickPower = 1;
 let autoClick = 0;
 let ownedHeroes = [];
 
-// URL твоего Google Apps Script
 const API_URL = "https://script.google.com/macros/s/AKfycbwM29IeHC2BALJ48apE293-RGTG5JiaBsTe1DZDbWLKZYq8UrVfjzY1f6myfPPfISjn/exec";
 
 const eternityDisplay = document.getElementById("eternity");
@@ -36,6 +35,7 @@ async function loadUserData() {
   try {
     const response = await fetch(`${API_URL}?user_id=${userId}`);
     const data = await response.json();
+    console.log("Loaded data:", data);
     eternity = data.eternity || 0;
     clickPower = data.clickPower || 1;
     autoClick = data.autoClick || 0;
@@ -44,7 +44,6 @@ async function loadUserData() {
     addHeroesToUI();
   } catch (error) {
     console.error("Error loading data:", error);
-    // Резервное сохранение из localStorage
     eternity = parseInt(localStorage.getItem("eternity")) || 0;
     clickPower = parseInt(localStorage.getItem("clickPower")) || 1;
     autoClick = parseInt(localStorage.getItem("autoClick")) || 0;
@@ -57,6 +56,7 @@ async function loadUserData() {
 // Сохранение данных
 async function saveUserData() {
   try {
+    console.log("Saving data:", { user_id: userId, eternity, clickPower, autoClick, ownedHeroes });
     await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -71,7 +71,6 @@ async function saveUserData() {
   } catch (error) {
     console.error("Error saving data:", error);
   }
-  // Резервное сохранение в localStorage
   localStorage.setItem("eternity", eternity.toString());
   localStorage.setItem("clickPower", clickPower.toString());
   localStorage.setItem("autoClick", autoClick.toString());
@@ -108,6 +107,7 @@ function buyHero(index) {
     eternity -= hero.cost;
     ownedHeroes.push(hero.name);
     autoClick += hero.income;
+    console.log(`Bought ${hero.name}, new ownedHeroes:`, ownedHeroes);
     updateUI();
     addHeroesToUI();
     saveUserData();
