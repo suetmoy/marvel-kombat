@@ -2,7 +2,7 @@
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-const user = tg.initDataUnsafe.user || { id: "test_user_" + Math.random() };
+const user = tg.initDataUnsafe.user || { id: "test_user_fixed" };
 const userId = user.id;
 console.log("User ID:", userId);
 
